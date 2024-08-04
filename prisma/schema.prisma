@@ -12,3 +12,37 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+
+// Models
+// User table
+model User {
+  userID   String @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  email    String @unique
+  password String
+}
+//Table model
+model Table {
+  tableID  String @id @default(auto()) @map("_id") @db.ObjectId
+  number   Int
+  capacity Int
+  state    State
+}
+//Reservation table
+model Reservation{
+  reservationID String  @id @default(auto()) @map("_id") @db.ObjectId
+  dateReservation DateTime
+  codeQR String
+}
+//Notification table
+model Notification{
+  notificationID String  @id @default(auto()) @map("_id") @db.ObjectId
+  message String
+  imageCodeQR String
+}
+
+//enum list
+enum State{
+  filled
+  free
+}
