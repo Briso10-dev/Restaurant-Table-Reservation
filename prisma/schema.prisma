@@ -30,7 +30,7 @@ model Table {
   tableID  String @id @default(auto()) @map("_id") @db.ObjectId
   number   Int
   capacity Int
-  state    State
+  state    State @default(free)
   //A table is reserves zero/one  times
   reservation Reservation?
 }
@@ -38,7 +38,7 @@ model Table {
 model Reservation{
   reservationID String  @id @default(auto()) @map("_id") @db.ObjectId
   dateReservation DateTime
-  codeQR String
+  codeQR String @unique
   //A reservation is connected to one table
   table_id String @unique @db.ObjectId 
   table Table @relation(fields: [table_id],references: [tableID])
@@ -50,7 +50,7 @@ model Reservation{
 model Notification{
   notificationID String  @id @default(auto()) @map("_id") @db.ObjectId
   message String
-  imageCodeQR String
+  imageCodeQR String @unique
   //A notification is concerned with one and only one user
   userNotifID String @db.ObjectId
   userNOtif User @relation(fields: [userNotifID],references: [userID])
