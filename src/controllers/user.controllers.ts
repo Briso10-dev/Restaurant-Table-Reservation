@@ -3,10 +3,15 @@ import { HttpCode } from "../core/constants";
 import prisma from "../core/config/prisma";
 import bcrypt from 'bcrypt'
 import sendError from "../core/constants/errors";
+import { validationResult } from "express-validator";
 import TokenOps from "../core/constants/jwt.functions";
 
 export const userControllers = {
     createUser: async (req: Request, res: Response) => {
+        // Check for validation errors
+        const errors = validationResult(req);
+        if (!errors.isEmpty())
+            return res.status(HttpCode.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
         try {
             const { name, email, password } = req.body
 
