@@ -13,3 +13,5 @@ userRoute.post("/login",userControllers.loginUser)
 userRoute.post("/logout",userControllers.logoutUser)
 // get user profile
 userRoute.get("/profile/:id",userControllers.getUser)
+// update user profile
+userRoute.put("/profile/:id",userValidator,userControllers.updateUser)

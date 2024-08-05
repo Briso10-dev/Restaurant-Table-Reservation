@@ -103,29 +103,105 @@ export const userControllers = {
     },
     // get user profile
     getUser: async (req: Request, res: Response) => {
-        const { id } = req.params
-
         try {
-            const userProfile = await prisma.user.findUnique({
+            const { id } = req.params
+            
+            //fisrt to verify if user is connected
+            const user = await prisma.user.findUnique({
+                select: {
+                    userID: true,
+                    name: true
+                },
                 where: {
                     userID: id
                 }
             })
-            if(!userProfile)
-                return res.status(HttpCode.NOT_FOUND).json({msg:"could not found user"})
+            if(!user) return res.status(HttpCode.NOT_FOUND).json({msg:"user not found"})
             const accessToken = req.headers.authorization
-            const refreshToken = req.cookies[`${userProfile.name}-cookie`]
+            const refreshToken = req.cookies[`${user.name}-cookie`]
             // verifying if token exists
             if (!accessToken || !refreshToken)
-                return res.status(HttpCode.UNAUTHORIZED).json({ message: `Unauthorized:${userProfile.name} not actually connected` });
+                return res.status(HttpCode.UNAUTHORIZED).json({ message: `Unauthorized:${user.name} not actually connected` });
             console.log("yo")
             const decodedUser = TokenOps.verifyAccessToken(accessToken);
             console.log("yo")
             if (!decodedUser)
                 return res.status(HttpCode.UNPROCESSABLE_ENTITY).json({ msg: "Invalid or expired token" })
+            const userProfile = await prisma.user.findUnique({
+                where: {
+                    userID: id
+                }
+            })
             if (!userProfile)
-                return res.json({ msg: "User info's failed retrieval" }).status(HttpCode.NOT_FOUND)
-            return res.status(HttpCode.OK).json({msg:`${userProfile.name} successfully login`})
+                return res.status(HttpCode.NOT_FOUND).json({ msg: "could not found user" })
+            return res.status(HttpCode.OK).json({ msg: `${userProfile.name} successfully login` })
+        } catch (error) {
+            sendError(res, error)
+        }
+    },
+    updateUser: async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params //obtaining a user's id
+            const { name, email, password } = req.body //obtaining modified users's info
+
+            const passHash = await bcrypt.hash(password, 10)
+
+            const updateUser = await prisma.user.update({
+                select: {
+                    name: true,
+                    email: true,
+                    password: true
+                },
+                where: {
+                    userID: id
+                },
+                data: {
+                    name,
+                    email,
+                    password: passHash
+                }
+            })
+            if (!updateUser) return res.status(HttpCode.BAD_REQUEST).json({ msg: "enterd correct infos" })
+            return res.status(HttpCode.OK).json(updateUser)
+        } catch (error) {
+            sendError(res, error)
+        }
+    },
+    // deletion of a user's profile
+    deleteUser: async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params
+
+            //fisrt to verify if user is connected
+            const user = await prisma.user.findUnique({
+                select: {
+                    userID: true,
+                    name: true
+                },
+                where: {
+                    userID: id
+                }
+            })
+            if(!user) return res.status(HttpCode.NOT_FOUND).json({msg:"user not found"})
+            const accessToken = req.headers.authorization
+            const refreshToken = req.cookies[`${user.name}-cookie`]
+            // verifying if token exists
+            if (!accessToken || !refreshToken)
+                return res.status(HttpCode.UNAUTHORIZED).json({ message: `Unauthorized:${user.name} not actually connected` });
+            console.log("yo")
+            const decodedUser = TokenOps.verifyAccessToken(accessToken);
+            console.log("yo")
+            if (!decodedUser)
+                return res.status(HttpCode.UNPROCESSABLE_ENTITY).json({ msg: "Invalid or expired token" })
+            //now we delete the user
+            const deleteUser = await prisma.user.delete({
+                where: {
+                    userID: user?.userID
+                },
+            })
+            if (!deleteUser)
+                return res.status(HttpCode.NOT_FOUND).json({ msg: "user  not found" })
+            res.status(HttpCode.OK).json({ msg: "user successfully deleted" })
         } catch (error) {
             sendError(res, error)
         }
