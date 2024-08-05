@@ -24,6 +24,22 @@ const tableControllers = {
         } catch (error) {
             sendError(res,error)
         }
+    },
+    createTable : async (req:Request,res:Response)=>{
+        try {
+            const {number,capacity} = req.body
+
+            const table = await prisma.table.create({
+                data:{
+                    number,
+                    capacity
+                }
+            })
+            if(!table) res.status(HttpCode.INTERNAL_SERVER_ERROR).json({msg:"could not create table"})
+            return res.status(HttpCode.OK).json({table})
+        } catch (error) {
+            sendError(res,error)
+        }
     }
 }
 
