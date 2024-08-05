@@ -81,21 +81,51 @@ export const userControllers = {
                     email
                 }
             })
-            if (user) {
-                // obtaiining user's token
-                const accessToken = req.headers.authorization
-                const refreshToken = req.cookies[`${user.name}-cookie`]
-                // verifying if token exists
-                if (!accessToken || !refreshToken)
-                    return res.status(HttpCode.UNAUTHORIZED).json({ message: "Unauthorized: No token available or expired" });
-                console.log("yo")
-                const decodedUser = TokenOps.verifyAccessToken(accessToken);
-                console.log("yo")
-                if (!decodedUser)
-                    return res.status(HttpCode.UNPROCESSABLE_ENTITY).json({ msg: "Invalid or expired token" })
-                res.clearCookie('${user.name}-cookie`')
-                return res.status(HttpCode.OK).json({ msg: "User succesffully logout" })
-            }
+            if (!user)
+                return res.status(HttpCode.NOT_FOUND).json({ msg: `${email} not found` })
+            // obtaiining user's token
+            const accessToken = req.headers.authorization
+            const refreshToken = req.cookies[`${user.name}-cookie`]
+            // verifying if token exists
+            if (!accessToken || !refreshToken)
+                return res.status(HttpCode.UNAUTHORIZED).json({ message: "Unauthorized: No token available or expired" });
+            console.log("yo")
+            const decodedUser = TokenOps.verifyAccessToken(accessToken);
+            console.log("yo")
+            if (!decodedUser)
+                return res.status(HttpCode.UNPROCESSABLE_ENTITY).json({ msg: "Invalid or expired token" })
+            res.clearCookie('${user.name}-cookie`')
+            return res.status(HttpCode.OK).json({ msg: "User succesffully logout" })
+
+        } catch (error) {
+            sendError(res, error)
+        }
+    },
+    // get user profile
+    getUser: async (req: Request, res: Response) => {
+        const { id } = req.params
+
+        try {
+            const userProfile = await prisma.user.findUnique({
+                where: {
+                    userID: id
+                }
+            })
+            if(!userProfile)
+                return res.status(HttpCode.NOT_FOUND).json({msg:"could not found user"})
+            const accessToken = req.headers.authorization
+            const refreshToken = req.cookies[`${userProfile.name}-cookie`]
+            // verifying if token exists
+            if (!accessToken || !refreshToken)
+                return res.status(HttpCode.UNAUTHORIZED).json({ message: `Unauthorized:${userProfile.name} not actually connected` });
+            console.log("yo")
+            const decodedUser = TokenOps.verifyAccessToken(accessToken);
+            console.log("yo")
+            if (!decodedUser)
+                return res.status(HttpCode.UNPROCESSABLE_ENTITY).json({ msg: "Invalid or expired token" })
+            if (!userProfile)
+                return res.json({ msg: "User info's failed retrieval" }).status(HttpCode.NOT_FOUND)
+            return res.status(HttpCode.OK).json({msg:`${userProfile.name} successfully login`})
         } catch (error) {
             sendError(res, error)
         }
