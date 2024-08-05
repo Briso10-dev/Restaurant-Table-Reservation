@@ -40,6 +40,46 @@ const tableControllers = {
         } catch (error) {
             sendError(res,error)
         }
+    },
+    updateTable : async(req:Request,res:Response)=>{
+        try {
+            const {id} = req.params
+            const {number,capacity} = req.body
+
+            const updateTable = await prisma.table.update({
+                select:{
+                    tableID:true,
+                    number:true,
+                    capacity:true
+                },
+                where:{
+                    tableID : id
+                },
+                data:{
+                    number,
+                    capacity
+                }
+            })
+            if(!updateTable) res.status(HttpCode.INTERNAL_SERVER_ERROR).json(updateTable)
+            return res.status(HttpCode.OK).json(updateTable)
+        } catch (error) {
+            sendError(res,error)
+        }
+    },
+    deleteTable: async (req:Request,res:Response)=>{
+        try {
+            const {id} = req.params
+
+            const table = await prisma.table.delete({
+                where:{
+                    tableID : id
+                }
+            })
+            if(!table) res.status(HttpCode.INTERNAL_SERVER_ERROR).json({msg:"COuld not delete table"})
+            return res.status(HttpCode.OK).json({msg:`table${table.number} successfully deleted`})
+        } catch (error) {
+            sendError(res,error)
+        }
     }
 }
 
