@@ -9,3 +9,5 @@ export const userRoute = Router()
 userRoute.post("/signup",userValidator,userControllers.createUser)
 // user connexion
 userRoute.post("/login",userControllers.loginUser)
+// user deconnexion
+userRoute.post("/logout",userControllers.logoutUser)

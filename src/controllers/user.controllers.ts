@@ -23,10 +23,9 @@ export const userControllers = {
                     password: passHash
                 }
             })
-            if (user)
-                res.status(HttpCode.CREATED).json(user)
-            else
-                res.status(HttpCode.BAD_REQUEST).json({ msg: "User could not be created !" })
+            if (!user)
+                return res.status(HttpCode.BAD_REQUEST).json({ msg: "User could not be created !" })
+            return res.status(HttpCode.OK).json(user)
         } catch (error) {
             sendError(res, error)
         }
@@ -37,10 +36,10 @@ export const userControllers = {
             const { email, password } = req.body
 
             const user = await prisma.user.findFirst({
-                select:{
-                    name:true,
-                    email:true,
-                    password:true
+                select: {
+                    name: true,
+                    email: true,
+                    password: true
                 },
                 where: {
                     email
@@ -52,6 +51,7 @@ export const userControllers = {
             if (!testPass)
                 return res.status(HttpCode.NOT_FOUND).json({ msg: `${password} not correct` })
             // jwt token generation
+            user.password = "" //rendering the password null not to create token from it
             const accessToken = TokenOps.generateAccessToken(user)
             const refreshToken = TokenOps.generateRefreshToken(user)
             user.password = " "
@@ -63,6 +63,39 @@ export const userControllers = {
             console.log(accessToken)
             res.json({ msg: "User successfully logged in" }).status(HttpCode.OK)
 
+        } catch (error) {
+            sendError(res, error)
+        }
+    },
+    logoutUser: async (req: Request, res: Response) => {
+        try {
+
+            const { email } = req.body
+            //confirming first by email if user exists 
+            const user = await prisma.user.findFirst({
+                select: {
+                    name: true,
+                    email: true
+                },
+                where: {
+                    email
+                }
+            })
+            if (user) {
+                // obtaiining user's token
+                const accessToken = req.headers.authorization
+                const refreshToken = req.cookies[`${user.name}-cookie`]
+                // verifying if token exists
+                if (!accessToken || !refreshToken)
+                    return res.status(HttpCode.UNAUTHORIZED).json({ message: "Unauthorized: No token available or expired" });
+                console.log("yo")
+                const decodedUser = TokenOps.verifyAccessToken(accessToken);
+                console.log("yo")
+                if (!decodedUser)
+                    return res.status(HttpCode.UNPROCESSABLE_ENTITY).json({ msg: "Invalid or expired token" })
+                res.clearCookie('${user.name}-cookie`')
+                return res.status(HttpCode.OK).json({ msg: "User succesffully logout" })
+            }
         } catch (error) {
             sendError(res, error)
         }

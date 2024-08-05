@@ -7,7 +7,7 @@ import { setupSwagger } from './swagger';
 import morgan from 'morgan';
 import { ONE_HUNDRED, SIXTY } from './core/constants';
 import { userRoute } from './routes/user.routes';
-
+import cookieParser from 'cookie-parser';
 
 const app = express();
 app.use(express.json());
@@ -22,6 +22,7 @@ app.use(
 );
 
 app.use(morgan('combined'));
+app.use(cookieParser())
 app.use("/users",userRoute)
 
 
