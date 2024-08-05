@@ -9,6 +9,8 @@ import { ONE_HUNDRED, SIXTY } from './core/constants';
 import userRouter from './routes/user.routes';
 import cookieParser from 'cookie-parser';
 import routerTable from './routes/table.routes';
+import reservedRouter from './routes/reservation.routes';
+
 
 const app = express();
 app.use(express.json());
@@ -26,6 +28,7 @@ app.use(morgan('combined'));
 app.use(cookieParser())
 app.use("/users",userRouter)
 app.use("/tables",routerTable)
+app.use("/reservations",reservedRouter)
 
 setupSwagger(app);
 export default app;

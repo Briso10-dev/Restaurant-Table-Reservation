@@ -38,6 +38,7 @@ model Table {
 model Reservation{
   reservationID String  @id @default(auto()) @map("_id") @db.ObjectId
   dateReservation DateTime
+  hourReservation DateTime
   codeQR String @unique
   //A reservation is connected to one table
   table_id String @unique @db.ObjectId 
