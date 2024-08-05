@@ -20,6 +20,10 @@ model User {
   name     String
   email    String @unique
   password String
+  //A user receives zero/many notifications
+  notification Notification[]
+  //A user can do zero/one reservation
+  reservation Reservation?
 }
 //Table model
 model Table {
@@ -27,18 +31,29 @@ model Table {
   number   Int
   capacity Int
   state    State
+  //A table is reserves zero/one  times
+  reservation Reservation?
 }
 //Reservation table
 model Reservation{
   reservationID String  @id @default(auto()) @map("_id") @db.ObjectId
   dateReservation DateTime
   codeQR String
+  //A reservation is connected to one table
+  table_id String @unique @db.ObjectId 
+  table Table @relation(fields: [table_id],references: [tableID])
+  //A reservation is connected to one user
+  user_id String @unique @db.ObjectId 
+  user User @relation(fields: [user_id],references: [userID])
 }
 //Notification table
 model Notification{
   notificationID String  @id @default(auto()) @map("_id") @db.ObjectId
   message String
   imageCodeQR String
+  //A notification is concerned with one and only one user
+  userNotifID String @db.ObjectId
+  userNOtif User @relation(fields: [userNotifID],references: [userID])
 }
 
 //enum list
