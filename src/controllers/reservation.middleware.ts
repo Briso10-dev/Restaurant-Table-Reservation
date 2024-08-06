@@ -22,6 +22,30 @@ const reservedControllers = {
         } catch (error) {
             sendError(res,error)
         }
+    },
+    freeReservation : async (req:Request,res:Response)=>{
+        try {
+            const {id} = req.params
+
+            const freeTable = await prisma.table.update({
+                select:{
+                        number:true,
+                        capacity:true,
+                        state: true
+                },
+                where:{
+                    tableID : id
+                },
+                data:{
+                    state: "free"
+                }
+            })
+            if(!freeTable) return res.status(HttpCode.INTERNAL_SERVER_ERROR).json({msg:"could not provide you reservation"})
+                return res.status(HttpCode.OK).json(freeTable)
+
+        } catch (error) {
+            sendError(res,error)
+        }
     }
 }
 
