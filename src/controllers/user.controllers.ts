@@ -84,16 +84,6 @@ export const userControllers = {
             if (!user)
                 return res.status(HttpCode.NOT_FOUND).json({ msg: `${email} not found` })
             // obtaiining user's token
-            const accessToken = req.headers.authorization
-            const refreshToken = req.cookies[`${user.name}-cookie`]
-            // verifying if token exists
-            if (!accessToken || !refreshToken)
-                return res.status(HttpCode.UNAUTHORIZED).json({ message: "Unauthorized: No token available or expired" });
-            console.log("yo")
-            const decodedUser = TokenOps.verifyAccessToken(accessToken);
-            console.log("yo")
-            if (!decodedUser)
-                return res.status(HttpCode.UNPROCESSABLE_ENTITY).json({ msg: "Invalid or expired token" })
             res.clearCookie('${user.name}-cookie`')
             return res.status(HttpCode.OK).json({ msg: "User succesffully logout" })
 
@@ -105,28 +95,7 @@ export const userControllers = {
     getUser: async (req: Request, res: Response) => {
         try {
             const { id } = req.params
-            
-            //fisrt to verify if user is connected
-            const user = await prisma.user.findUnique({
-                select: {
-                    userID: true,
-                    name: true
-                },
-                where: {
-                    userID: id
-                }
-            })
-            if(!user) return res.status(HttpCode.NOT_FOUND).json({msg:"user not found"})
-            const accessToken = req.headers.authorization
-            const refreshToken = req.cookies[`${user.name}-cookie`]
-            // verifying if token exists
-            if (!accessToken || !refreshToken)
-                return res.status(HttpCode.UNAUTHORIZED).json({ message: `Unauthorized:${user.name} not actually connected` });
-            console.log("yo")
-            const decodedUser = TokenOps.verifyAccessToken(accessToken);
-            console.log("yo")
-            if (!decodedUser)
-                return res.status(HttpCode.UNPROCESSABLE_ENTITY).json({ msg: "Invalid or expired token" })
+
             const userProfile = await prisma.user.findUnique({
                 where: {
                     userID: id
