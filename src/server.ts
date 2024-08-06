@@ -3,7 +3,7 @@
 import express from 'express';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
-import { setupSwagger } from './swagger';
+import { setupSwagger } from './core/config/swagger';
 import morgan from 'morgan';
 import { ONE_HUNDRED, SIXTY } from './core/constants';
 import userRouter from './routes/user.routes';
