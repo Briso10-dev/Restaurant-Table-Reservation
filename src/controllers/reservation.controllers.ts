@@ -40,7 +40,15 @@ const reservedControllers = {
              // Generate QR code
             const qrCodeText = QRcode.formatData(reservation);
             const codeQR = await QRcode.generateQRCode(qrCodeText);
-            //update user's codeQR
+            //update  state's table and user's QRcode
+            await prisma.table.update({
+                where:{
+                    tableID:reservation.table_id
+                },
+                data:{
+                    state: "filled"
+                }
+            })
             const updateReservation = await prisma.reservation.update({
                 where:{
                     reservationID: reservation.reservationID
