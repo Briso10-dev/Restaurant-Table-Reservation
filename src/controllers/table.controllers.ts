@@ -2,6 +2,7 @@ import { Request,Response } from "express";
 import prisma from "../core/config/prisma";
 import { HttpCode } from "../core/constants";
 import sendError from "../core/constants/errors";
+import { validationResult } from "express-validator";
 
 const tableControllers = {
     //get available tables
@@ -26,6 +27,9 @@ const tableControllers = {
         }
     },
     createTable : async (req:Request,res:Response)=>{
+        const errors = validationResult(req);
+        if (!errors.isEmpty())
+            return res.status(HttpCode.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
         try {
             const {number,capacity} = req.body
 
