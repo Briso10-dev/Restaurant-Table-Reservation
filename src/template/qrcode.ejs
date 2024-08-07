@@ -1,57 +1,59 @@
+<!-- index.html -->
+
 <!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>QRcode Notification</title>
+		<title>QR Code Generator</title>
 		<style>
 			body {
 				font-family: Arial, sans-serif;
-				line-height: 1.6;
-				color: #333;
-			}
-			.container {
-				width: 100%;
-				max-width: 600px;
-				margin: 0 auto;
-				padding: 20px;
-			}
-			.header {
-				background-color: #4a90e2;
-				color: white;
-				padding: 10px;
 				text-align: center;
+				margin-top: 50px;
 			}
+
 			.content {
-				padding: 20px;
-				background-color: #f9f9f9;
+				margin-bottom: 15px;
 			}
-			.footer {
-				text-align: center;
+
+			.margin {
+				margin-right: 18px;
+			}
+
+			.qr-input {
+				padding: 10px;
+				width: 200px;
+			}
+
+			#qr-result img {
 				margin-top: 20px;
-				font-size: 0.8em;
-				color: #888;
+				border: 1px solid #000;
+			}
+
+			button {
+				padding: 10px 12px;
+				text-transform: uppercase;
+				border-radius: 5px;
+				background-color: bisque;
 			}
 		</style>
 	</head>
+
 	<body>
-		<div class="container">
-			<div class="header">
-				<h1>Book Return Reminder</h1>
+		<h1>QR Code Generator</h1>
+		<form id="qr-form">
+			<div class="content">
+				<label for="qr-id" class="margin">ID:</label>
+				<input type="text" id="qr-id" class="qr-input" placeholder="Enter ID" />
 			</div>
 			<div class="content">
-				<p>Dear <%= employeeName %>,</p>
-				<p>
-					
-				</p>
-				<p>
-					Please ensure that you return the book on time to avoid any late fees and to allow other members to enjoy it.
-				</p>
-				<p>Thank you for using our library services!</p>
+				<label for="qr-price">Price:</label>
+				<input type="text" id="qr-price" class="qr-input" placeholder="Enter Price" />
 			</div>
-			<div class="footer">
-				<p>This is an automated message. Please do not reply to this email.</p>
-			</div>
-		</div>
+			<button type="submit" class="content">Generate QR Code</button>
+		</form>
+		<div id="qr-result"></div>
+		<script src="script.js"></script>
 	</body>
 </html>

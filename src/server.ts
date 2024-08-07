@@ -3,6 +3,8 @@
 import express from 'express';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
+import bodyParser from 'body-parser';
+import cors from 'cors'
 import { setupSwagger } from './core/config/swagger';
 import morgan from 'morgan';
 import { ONE_HUNDRED, SIXTY } from './core/constants';
@@ -26,6 +28,8 @@ app.use(
 
 app.use(morgan('combined'));
 app.use(cookieParser())
+app.use(bodyParser.json())
+app.use(cors())
 app.use("/users",userRouter)
 app.use("/tables",routerTable)
 app.use("/reservations",reservedRouter)

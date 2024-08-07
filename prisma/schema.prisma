@@ -39,7 +39,7 @@ model Reservation{
   reservationID String  @id @default(auto()) @map("_id") @db.ObjectId
   dateReservation DateTime
   hourReservation DateTime
-  codeQR String @unique
+  codeQR String? @unique //(?:Since I was first oblaged to insert codeQR in req body)
   //A reservation is connected to one table
   table_id String @unique @db.ObjectId 
   table Table @relation(fields: [table_id],references: [tableID])
