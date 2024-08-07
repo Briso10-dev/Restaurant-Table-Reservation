@@ -5,9 +5,14 @@ import sendError from "../core/constants/errors";
 import QRcode from "../core/constants/qrcode";
 import sendMail from "../core/config/send.mail";
 import EmailTemplate from "../core/template";
+import { validationResult } from "express-validator";
 
 const reservedControllers = {
     createReservation: async (req: Request, res: Response) => {
+         // Check for validation errors
+         const errors = validationResult(req);
+         if (!errors.isEmpty())
+             return res.status(HttpCode.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
         try {
             const { user_id, table_id, dateReservation, hourReservation } = req.body
             //verifying if user and table exists
