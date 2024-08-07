@@ -1,7 +1,7 @@
 // src/app.ts
 // Lancement du serveur
 import { envs } from './core/config/env';
-import app from './server';
+import app from './server.config';
 import chalk from 'chalk'
 
 app.listen(envs.PORT, () => {
