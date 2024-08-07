@@ -3,10 +3,13 @@ import ejs from "ejs";
 import path from "path";
 
 const EmailTemplate = {
-  QRcodeSender: async (employeeName: string,message: string,QRcode: string) => {
+  QRcodeSender: async (userName:string,tableNumber:number,date:Date,hour:Date,message: string,QRcode: string) => {
     try {
-      const html = await ejs.renderFile(path.join(__dirname, "reminder.ejs"), {
-        employeeName,
+      const html = await ejs.renderFile(path.join(__dirname, "qrcode.ejs"), {
+        userName,
+        tableNumber,
+        date,
+        hour,
         message,
         QRcode
       });

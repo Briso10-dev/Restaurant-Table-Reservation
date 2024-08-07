@@ -3,7 +3,8 @@ import prisma from "../core/config/prisma";
 import { HttpCode } from "../core/constants";
 import sendError from "../core/constants/errors";
 import QRcode from "../core/constants/qrcode";
-
+import sendMail from "../core/config/send.mail";
+import EmailTemplate from "../core/template";
 
 const reservedControllers = {
     createReservation: async (req: Request, res: Response) => {
@@ -13,7 +14,8 @@ const reservedControllers = {
             const [user, table] = await Promise.all([
                 prisma.user.findUnique({
                     select: {
-                        userID: true
+                        name: true,
+                        email: true,
                     },
                     where: {
                         userID: user_id
@@ -21,7 +23,8 @@ const reservedControllers = {
                 }),
                 prisma.table.findUnique({
                     select: {
-                        tableID: true
+                        tableID: true,
+                        number:true,
                     },
                     where: {
                         tableID: table_id
@@ -38,27 +41,35 @@ const reservedControllers = {
                     hourReservation,
                 }
             })
-             // Generate QR code
+            // Generate QR code
             const qrCodeText = QRcode.formatData(reservation);
             const codeQR = await QRcode.generateQRCode(qrCodeText);
             //update  state's table and user's QRcode
             await prisma.table.update({
-                where:{
-                    tableID:reservation.table_id
+                where: {
+                    tableID: reservation.table_id
                 },
-                data:{
+                data: {
                     state: "filled"
                 }
             })
             const updateReservation = await prisma.reservation.update({
-                where:{
+                where: {
                     reservationID: reservation.reservationID
                 },
-                data : {
-                    codeQR 
+                data: {
+                    codeQR
                 }
             })
             if (!updateReservation) return res.status(HttpCode.INTERNAL_SERVER_ERROR).json({ msg: "could not provide you reservation" })
+            const message = "Reservation succeed"
+            sendMail(user.email, "Exercice3-Restaurant Table Reservation System", await EmailTemplate.QRcodeSender(
+                user.name,
+                table.number,
+                reservation.dateReservation,
+                reservation.hourReservation,
+                message,
+                reservation.codeQR))
             return res.status(HttpCode.OK).json(updateReservation)
         } catch (error) {
             sendError(res, error)

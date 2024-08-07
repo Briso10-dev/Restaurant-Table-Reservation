@@ -1,59 +1,99 @@
-<!-- index.html -->
-
 <!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>QR Code Generator</title>
+		<title>Table Reservation QR Code</title>
 		<style>
+			* {
+				padding: 0;
+				border: 0;
+				margin: 0;
+				box-sizing: border-box;
+			}
 			body {
 				font-family: Arial, sans-serif;
+				line-height: 1.6;
+				color: #333;
+				background-color: #f4f4f4;
+			}
+			.container {
+				width: 100%;
+				max-width: 600px;
+				margin: 0 auto;
+				padding: 20px;
+				background-color: #ffffff;
+			}
+			.header {
+				background-color: #2eaccc;
+				color: white;
+				padding: 20px;
 				text-align: center;
-				margin-top: 50px;
+				border-radius: 5px 5px 0 0;
 			}
-
 			.content {
-				margin-bottom: 15px;
+				padding: 30px;
+				background-color: #ffffff;
+				border-radius: 0 0 5px 5px;
+				box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 			}
-
-			.margin {
-				margin-right: 18px;
-			}
-
-			.qr-input {
-				padding: 10px;
-				width: 200px;
-			}
-
-			#qr-result img {
+			.footer {
+				text-align: center;
 				margin-top: 20px;
-				border: 1px solid #000;
-			}
-
-			button {
-				padding: 10px 12px;
-				text-transform: uppercase;
+				padding: 10px;
+				font-size: 14px;
+				color: #888;
+				background-color: #f9f9f9;
 				border-radius: 5px;
-				background-color: bisque;
+			}
+			.qr-code {
+				text-align: center;
+				margin-top: 20px;
+			}
+			.qr-code img {
+				max-width: 200px;
+				height: auto;
+			}
+			.reservation-details {
+				margin-top: 20px;
+				background-color: #f9f9f9;
+				padding: 15px;
+				border-radius: 5px;
+			}
+			.reservation-details p {
+				margin-bottom: 10px;
 			}
 		</style>
 	</head>
-
 	<body>
-		<h1>QR Code Generator</h1>
-		<form id="qr-form">
-			<div class="content">
-				<label for="qr-id" class="margin">ID:</label>
-				<input type="text" id="qr-id" class="qr-input" placeholder="Enter ID" />
+		<div class="container">
+			<div class="header">
+				<h1>Table Reservation QR Code</h1>
 			</div>
 			<div class="content">
-				<label for="qr-price">Price:</label>
-				<input type="text" id="qr-price" class="qr-input" placeholder="Enter Price" />
+				<p>Dear <%= userName %>,</p>
+				<p>Your table reservation has been confirmed. Here are your reservation details:</p>
+				
+				<div class="reservation-details">
+					<p><strong>Table Number:</strong> <%= tableNumber %></p>
+					<p><strong>Date:</strong> <%= date.toDateString() %></p>
+					<p><strong>Time:</strong> <%= hour.toLocaleTimeString() %></p>
+				</div>
+
+				<p><%= message %></p>
+
+				<div class="qr-code">
+					<p><strong>Your QR Code:</strong></p>
+					<img src="<%= QRcode %>" alt="Reservation QR Code">
+					<br>
+					<p>Please present this QR code upon arrival at the restaurant.</p>
+				</div>
+				<br><br>
+				<p>We look forward to serving you!</p>
 			</div>
-			<button type="submit" class="content">Generate QR Code</button>
-		</form>
-		<div id="qr-result"></div>
-		<script src="script.js"></script>
+			<div class="footer">
+				<p>This is an automated message. Please do not reply to this email.</p>
+			</div>
+		</div>
 	</body>
 </html>
