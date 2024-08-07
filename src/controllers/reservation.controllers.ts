@@ -24,7 +24,7 @@ const reservedControllers = {
                 prisma.table.findUnique({
                     select: {
                         tableID: true,
-                        number:true,
+                        number: true,
                     },
                     where: {
                         tableID: table_id
@@ -50,7 +50,7 @@ const reservedControllers = {
                     tableID: reservation.table_id
                 },
                 data: {
-                    state: "filled"
+                    state: "reserved"
                 }
             })
             const updateReservation = await prisma.reservation.update({
@@ -71,6 +71,51 @@ const reservedControllers = {
                 message,
                 reservation.codeQR))
             return res.status(HttpCode.OK).json(updateReservation)
+        } catch (error) {
+            sendError(res, error)
+        }
+    },
+    QRcodeScan: async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params
+            //finding user's reservation's id
+            const reservation = await prisma.reservation.findUnique({
+                select: {
+                    user_id: true,
+                    table_id: true,
+                    dateReservation: true,
+                    hourReservation: true
+                },
+                where: {
+                    reservationID: id
+                }
+            })
+            if (!reservation) return res.status(HttpCode.NOT_FOUND).json({ msg: "never reserved here" })
+                //updating table's state
+                await prisma.table.update({
+                    where:{
+                        tableID:reservation.table_id
+                    },
+                    data:{
+                        state:"occupied"
+                    }
+            })
+            //rendering QRcode invalid
+            const updateReserved = await prisma.reservation.update({
+                select: {
+                    user_id: true,
+                    table_id: true,
+                    dateReservation: true,
+                    codeQR: true
+                },
+                where: {
+                    reservationID: id
+                },
+                data: {
+                    codeQR: null,
+                }
+            })
+            return res.status(HttpCode.OK).json(updateReserved)
         } catch (error) {
             sendError(res, error)
         }

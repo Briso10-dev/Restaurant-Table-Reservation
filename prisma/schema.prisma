@@ -59,6 +59,7 @@ model Notification{
 
 //enum list
 enum State{
-  filled
   free
+  reserved
+  occupied
 }
