@@ -12,13 +12,13 @@ export const userValidator = [
 export const tableValidator = [
   body('number','Inavalid does not Empty').not().isEmpty(),
   body('capacity','Inavalid does not Empty').not().isEmpty(),
-  body('number','Inavalid does not Empty').isLength({max:10})
+  body('number','Must be at least 10 characters').isLength({max:10})
 ]
 //verifying non empty  fields
 export const reservationValidator = [
-  body('user_id','Inavalid does not Empty').not().isEmpty().isLength({min:24}),
-  body('table_id','Inavalid does not Empty').not().isEmpty().isLength({min:24}),
-  body('dateReservationID','Inavalid does not Empty').not().isEmpty().isDate(),
+  body('user_id','must be atleast 24 characters').not().isEmpty().isLength({min:24}),
+  body('table_id','must be atleast 24 characters').not().isEmpty().isLength({min:24}),
+  body('dateReservation','Inavalid does not Empty').not().isEmpty().isDate(),
   body('hourReservation','Inavalid does not Empty').not().isEmpty().isDate(),
   
 ]

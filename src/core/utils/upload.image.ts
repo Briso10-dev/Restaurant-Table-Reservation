@@ -2,27 +2,23 @@ import multer from "multer";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import fs from "fs";
 import path from "path";
-
+import { envs } from "../config/env";
 // Configure Multer for file uploads
 export const upload = multer({ dest: "uploads/" });
 
 // Create an S3 client
 const s3Client = new S3Client({
-  region: "us-east-1",
-  endpoint: "https://localstack.worketyamo.com",
+  region: envs.REGION,
+  endpoint: envs.ENDPOINT,
   forcePathStyle: true, // Required for LocalStack
   credentials: {
-    accessKeyId: "test", // Use your AWS access key
-    secretAccessKey: "test" // Use your AWS secret key
+    accessKeyId: envs.ACCESS_KEY, // Use your AWS access key
+    secretAccessKey: envs.SECRET_KEY // Use your AWS secret key
   }
 });
 
 // Function to upload an image to S3
-async function uploadImageToS3(
-  bucketName: string,
-  key: string,
-  filePath: string
-) {
+async function uploadImageToS3(bucketName: string,key: string,filePath: string    ) {
   // Read the file from the file system
   const fileStream = fs.createReadStream(filePath);
 
@@ -37,6 +33,7 @@ async function uploadImageToS3(
       contentType = "image/jpeg";
       break;
     case ".png":
+      
       contentType = "image/png";
       break;
     default:
@@ -50,7 +47,7 @@ async function uploadImageToS3(
     Body: fileStream,
     ContentType: contentType
   };
-
+``
   try {
     const data = await s3Client.send(new PutObjectCommand(uploadParams));
     console.log(`Successfully uploaded ${key} to ${bucketName}`, data);

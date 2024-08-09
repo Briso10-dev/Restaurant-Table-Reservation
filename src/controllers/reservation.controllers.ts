@@ -6,15 +6,27 @@ import QRcode from "../core/constants/qrcode";
 import sendMail from "../core/config/send.mail";
 import EmailTemplate from "../core/template";
 import { validationResult } from "express-validator";
+import uploadImageToS3 from "../core/utils/upload.image";
 
 const reservedControllers = {
     createReservation: async (req: Request, res: Response) => {
-         // Check for validation errors
-         const errors = validationResult(req);
-         if (!errors.isEmpty())
-             return res.status(HttpCode.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
+        if (!req.file) {
+            return res.status(400).send("No file uploaded.");
+        }
+        // Parse the JSON data from the form field
+        let jsonData;
         try {
-            const { user_id, table_id, dateReservation, hourReservation } = req.body
+            jsonData = JSON.parse(req.body.json);
+        } catch (error) {
+            return res.status(400).send("Invalid JSON data");
+        }
+
+        // Check for validation errors
+        const errors = validationResult(req.body.json);
+        if (!errors.isEmpty())
+            return res.status(HttpCode.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
+        try {
+            const { user_id, table_id, dateReservation, hourReservation } = jsonData;
             //verifying if user and table exists
             const [user, table] = await Promise.all([
                 prisma.user.findUnique({
@@ -63,9 +75,14 @@ const reservedControllers = {
                     reservationID: reservation.reservationID
                 },
                 data: {
-                    codeQR
+                    codeQR: `http://localhost:9001/browser/briso-bucket/images/${req.file.originalname}`
                 }
             })
+            const bucketName = "briso-bucket";
+            const key = `images/${req.file.originalname}`;
+            let filePath = req.file.path;
+
+            await uploadImageToS3(bucketName, key, filePath);
             if (!updateReservation) return res.status(HttpCode.INTERNAL_SERVER_ERROR).json({ msg: "could not provide you reservation" })
             const message = "Reservation succeed"
             sendMail(user.email, "Exercice3-Restaurant Table Reservation System", await EmailTemplate.QRcodeSender(
@@ -96,14 +113,14 @@ const reservedControllers = {
                 }
             })
             if (!reservation) return res.status(HttpCode.NOT_FOUND).json({ msg: "never reserved here" })
-                //updating table's state
-                await prisma.table.update({
-                    where:{
-                        tableID:reservation.table_id
-                    },
-                    data:{
-                        state:"occupied"
-                    }
+            //updating table's state
+            await prisma.table.update({
+                where: {
+                    tableID: reservation.table_id
+                },
+                data: {
+                    state: "occupied"
+                }
             })
             //rendering QRcode invalid
             const updateReserved = await prisma.reservation.update({
