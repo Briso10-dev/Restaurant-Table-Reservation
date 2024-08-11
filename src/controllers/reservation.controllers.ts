@@ -56,9 +56,10 @@ const reservedControllers = {
             await QRcode.generateQRCode(filePath, qrCodeText);
 
             // Upload QR code to S3
-            const bucketName = "briso-bucket";
+            const bucketName = "rashid";
             const key = `qrcodes/${fileName}`;
-            await uploadImageToS3(bucketName, key, filePath);
+            const signedUrl = await uploadImageToS3(bucketName, key, filePath);
+            console.log(signedUrl)
             //update  state's table and user's QRcode
             await prisma.table.update({
                 where: {
@@ -78,13 +79,19 @@ const reservedControllers = {
             })
             if (!updateReservation) return res.status(HttpCode.INTERNAL_SERVER_ERROR).json({ msg: "could not provide you reservation" })
             const message = "Reservation succeed"
-            await sendMail(user.email, "Exercice3-Restaurant Table Reservation System", await EmailTemplate.QRcodeSender(
+            const emailContent = await EmailTemplate.QRcodeSender(
                 user.name,
                 table.number,
                 reservation.dateReservation,
                 reservation.hourReservation,
                 message,
-                updateReservation.codeQR))
+                signedUrl
+            );
+
+            console.log('Email Content:', emailContent);
+
+            await sendMail(user.email, "Exercice3-Restaurant Table Reservation System", emailContent);
+
             return res.status(HttpCode.OK).json(updateReservation)
         } catch (error) {
             sendError(res, error)
