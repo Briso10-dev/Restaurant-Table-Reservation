@@ -4,26 +4,24 @@ import QRCode from "qrcode";
 const QRcode = {
     formatData: (data: object) => {
         try {
-            const qrCodeText = `Reservation ID: ${data.reservationID}, User ID: ${data.user_id}, Table ID: ${data.table_id}, Date: ${data.dateReservation}, Time: ${data.hourReservation}`;
+            const qrCodeText = `${data.reservationID}`;
             return qrCodeText;
         } catch (error) {
             console.error("Error formatting QR code data:", error);
         }
     },
-    generateQRCode: async (qrCodeText: string) => {
+    generateQRCode: async (path: string, qrCodeText: string) => {
         try {
-            const options = {
-                errorCorrectionLevel: 'H',
-                type: 'png',
-                quality: 1,
-                margin: 1,
-                width: 256,
-            };
-            const qrCodeDataUrl = await QRCode.toDataURL(qrCodeText, options);
+            const qrCodeDataUrl = await QRCode.toFile(path, qrCodeText,
+                {errorCorrectionLevel:'H',
+                    type:'png',
+                    margin:1,
+                    width: 256
+                });
             return qrCodeDataUrl;
         } catch (error) {
             console.error("Error generating QR code:", error);
-            
+
         }
     }
 }

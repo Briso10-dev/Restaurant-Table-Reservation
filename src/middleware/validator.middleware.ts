@@ -18,7 +18,7 @@ export const tableValidator = [
 export const reservationValidator = [
   body('user_id','must be atleast 24 characters').not().isEmpty().isLength({min:24}),
   body('table_id','must be atleast 24 characters').not().isEmpty().isLength({min:24}),
-  body('dateReservation','Inavalid does not Empty').not().isEmpty().isDate(),
-  body('hourReservation','Inavalid does not Empty').not().isEmpty().isDate(),
+  body('dateReservation','Inavalid does not Empty').not().isEmpty(),
+  body('hourReservation','Inavalid does not Empty').not().isEmpty(),
   
 ]
