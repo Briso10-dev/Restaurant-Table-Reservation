@@ -48,10 +48,11 @@ const reservedControllers = {
                     hourReservation,
                 }
             })
-            // Generate QR code
+            //setting up the upload folder
             const uploadDir = path.join(__dirname, '..', 'uploads');
             const fileName = `${reservation.reservationID}.png`;
             const filePath = path.join(uploadDir, fileName);
+            // logic to generate QR code
             const qrCodeText = QRcode.formatData(reservation);
             await QRcode.generateQRCode(filePath, qrCodeText);
 

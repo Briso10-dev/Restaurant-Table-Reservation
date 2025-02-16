@@ -9,10 +9,7 @@ export const envs = {
 	NODE_ENV: get('NODE_ENV').default('development').asString(),
 	MONGO_INITDB_ROOT_USERNAME: get('MONGO_INITDB_ROOT_USERNAME').default('admin').asString(),
 	MONGO_INITDB_ROOT_PASSWORD: get('MONGO_INITDB_ROOT_PASSWORD').default('test123').asString(),
-	MONGO_DB_NAME: get('MONGO_DB_NAME').default('worketyamo').asString(),
-	JWT_ACCESS_TOKEN_PRIV: get("JWT_ACCESS_TOKEN_PRIV").required().asString(),
-	JWT_REFRESH_TOKEN_PRIV: get("JWT_REFRESH_TOKEN_PRIV").required().asString(),
-	JWT_ACCESS_TOKEN_PUB: get("JWT_ACCESS_TOKEN_PUB").required().asString(),
+	
 	JWT_REFRESH_TOKEN_PUB: get("JWT_REFRESH_TOKEN_PUB").required().asString(),
 	// GMAIL configurations
 	SERVICE: get("SERVICE").required().asString(),
@@ -22,6 +19,7 @@ export const envs = {
 	MAIL_USER: get("MAIL_USER").required().asString(),
 	MAIL_PASS: get("MAIL_PASS").required().asString(),
 	MAIL_FROM: get("MAIL_FROM").required().asString(),
+	// AWS configs
 	ENDPOINT: get("END_POINT").required().asString(),
 	ACCESS_KEY: get("ACCESS_KEY").required().asString(),
 	SECRET_KEY: get("SECRET_KEY").required().asString(),
